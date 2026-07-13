@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DMRC Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f5f0e8;color:#1a1a1a;min-height:100vh}
+.metro-strip{height:5px;background:linear-gradient(90deg,#E31E24 0%,#F7941D 20%,#8DC63F 40%,#006838 60%,#0072BC 80%,#662D91 100%)}
+.header{background:linear-gradient(135deg,#8B0000 0%,#C01E1E 60%,#D42B2B 100%);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 2px 12px rgba(139,0,0,.35)}
+.header-left{display:flex;align-items:center;gap:.85rem}
+.h-logo{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center}
+.h-logo img{width:28px;height:28px;object-fit:contain;filter:brightness(0) invert(1)}
+.h-title{font-size:15px;color:#fff;font-weight:700}
+.h-title span{color:#FFD700}
+.h-sub{font-size:12px;color:rgba(255,255,255,.7)}
+.btn-logout{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:12px;padding:.35rem .8rem;border-radius:20px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500}
+.btn-logout:hover{background:rgba(255,255,255,.25)}
+.main{max-width:960px;margin:0 auto;padding:1.5rem 1rem}
+.section-title{font-size:11px;font-weight:700;color:#8a7a6a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
+.card{background:#fff;border:1px solid #e0d5c8;border-radius:12px;padding:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-title{font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:.25rem;display:flex;align-items:center;gap:.5rem}
+.card-desc{font-size:12px;color:#8a7a6a;margin-bottom:1rem}
+.card-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.field{margin-bottom:.75rem}
+.field label{display:block;font-size:11px;color:#8a7a6a;margin-bottom:.3rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.field input{width:100%;background:#f9f5ef;border:1.5px solid #e0d5c8;border-radius:8px;padding:.55rem .9rem;color:#1a1a1a;font-size:13px;font-family:'Inter',sans-serif;outline:none}
+.field input:focus{border-color:#C01E1E;background:#fff}
+.field input::placeholder{color:#b0a090}
+.upload-zone{border:1.5px dashed #ddd0c0;border-radius:8px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#f9f5ef}
+.upload-zone:hover{border-color:#C01E1E;background:#fff5f5}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-zone svg{width:24px;height:24px;color:#b0a090;margin-bottom:.4rem}
+.upload-zone .uz-title{font-size:13px;color:#5a4a3a;font-weight:500}
+.upload-zone .uz-sub{font-size:11px;color:#b0a090;margin-top:.2rem}
+.btn{border:none;border-radius:8px;padding:.55rem 1.1rem;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-primary{background:#C01E1E;color:#fff}
+.btn-primary:hover{background:#a01818}
+.btn-danger{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+.btn-danger:hover{background:#ffcdd2}
+.btn-full{width:100%;margin-top:.5rem}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:.8rem 1.2rem;border-radius:10px;font-size:13px;font-weight:600;z-index:100;opacity:0;transform:translateY(10px);transition:all .3s;max-width:360px}
+.toast.success{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+.toast.error{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+.toast.show{opacity:1;transform:translateY(0)}
+.emp-table{width:100%;border-collapse:collapse;font-size:13px}
+.emp-table th{text-align:left;padding:.5rem .75rem;color:#8a7a6a;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-bottom:1.5px solid #e0d5c8}
+.emp-table td{padding:.55rem .75rem;border-bottom:1px solid #f0e8e0;color:#2c2c2c}
+.emp-table tr:last-child td{border-bottom:none}
+.emp-table tr:hover td{background:#fdf8f3}
+.status-active{color:#2e7d32;font-size:11px;background:#e8f5e9;padding:2px 8px;border-radius:20px;border:1px solid #a5d6a7;font-weight:600}
+.status-inactive{color:#b71c1c;font-size:11px;background:#ffebee;padding:2px 8px;border-radius:20px;font-weight:600}
+.tab-bar{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid #e0d5c8}
+.tab{padding:.65rem 1.1rem;font-size:13px;font-weight:600;color:#8a7a6a;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab:hover{color:#C01E1E}
+.tab.active{color:#C01E1E;border-bottom-color:#C01E1E}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.section{margin-bottom:1.5rem}
+.info-box{background:#fff8f0;border:1px solid #f5d5b8;border-left:3px solid #C01E1E;border-radius:10px;padding:.85rem 1rem;font-size:12px;color:#7a4a1a;margin-bottom:1rem}
+.info-box strong{color:#C01E1E}
+/* File section cards */
+.file-section-card{background:#fff;border:1px solid #e0d5c8;border-radius:12px;padding:1.25rem;display:flex;gap:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.fsc-left{flex:1;min-width:0}
+.fsc-title{font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:.25rem}
+.fsc-desc{font-size:12px;color:#8a7a6a;line-height:1.6}
+.fsc-right{width:220px;flex-shrink:0;background:#f9f5ef;border-radius:10px;padding:1rem;border:1px solid #e8ddd0;display:flex;flex-direction:column;gap:.5rem}
+.fsr-empty{font-size:12px;color:#b0a090;text-align:center;padding:.5rem 0}
+.fsr-status{font-size:12px;font-weight:600;padding:.35rem .7rem;border-radius:6px;text-align:center;margin-bottom:.25rem}
+.fsr-status.active{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+.fsr-status.expired{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+.fsr-status.warning{background:#fff3e0;color:#e65100;border:1px solid #ffcc80}
+.fsr-status.none{background:#f5f5f5;color:#9e9e9e;border:1px solid #e0e0e0}
+.fsr-detail{font-size:11px;color:#8a7a6a;line-height:1.5}
+.fsr-detail strong{color:#5a4a3a}
+.fsr-btns{display:flex;flex-direction:column;gap:.4rem;margin-top:.25rem}
+.fsr-btn-remove{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a;border-radius:6px;padding:.4rem .7rem;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;text-align:center}
+.fsr-btn-remove:hover{background:#ffcdd2}
+.fsr-btn-remove.blocked{background:#f5f5f5;color:#9e9e9e;border-color:#e0e0e0;cursor:not-allowed}
+/* Multi-file upload zone */
+.multi-upload-zone{border:2px dashed #ddd0c0;border-radius:12px;padding:2rem 1.5rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#f9f5ef}
+.multi-upload-zone:hover,.multi-upload-zone.dragover{border-color:#C01E1E;background:#fff5f5}
+.multi-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.muz-icon{color:#b0a090;margin-bottom:.6rem}
+.muz-title{font-size:14px;font-weight:600;color:#5a4a3a;margin-bottom:.25rem}
+.muz-sub{font-size:12px;color:#b0a090}
+/* Progress item */
+.progress-item{display:flex;align-items:center;gap:.6rem;background:#f9f5ef;border:1px solid #e8ddd0;border-radius:8px;padding:.55rem .8rem;margin-bottom:.4rem;font-size:13px}
+.progress-item .pi-name{flex:1;color:#2c2c2c;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progress-item .pi-status{font-size:12px;font-weight:600;flex-shrink:0}
+.pi-status.uploading{color:#e65100}
+.pi-status.done{color:#2e7d32}
+.pi-status.error{color:#b71c1c}
+/* Uploaded file card */
+.uploaded-file-card{background:#fff;border:1px solid #e0d5c8;border-radius:10px;padding:.85rem 1rem;margin-bottom:.5rem;display:flex;align-items:flex-start;gap:.75rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ufc-icon{width:36px;height:36px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.ufc-body{flex:1;min-width:0}
+.ufc-name{font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ufc-meta{font-size:11px;color:#8a7a6a;line-height:1.5}
+.ufc-remove{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a;border-radius:6px;padding:.3rem .65rem;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;flex-shrink:0;white-space:nowrap}
+.ufc-remove:hover{background:#ffcdd2}
+/* Stat cards */
+.stat-card{background:#fff;border:1px solid #e0d5c8;border-radius:10px;padding:.85rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sc-icon{font-size:20px;margin-bottom:.3rem}
+.sc-label{font-size:11px;color:#8a7a6a;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem}
+.sc-val{font-size:13px;font-weight:700;color:#1a1a1a}
+</style>
+</head>
+<body>
+<div class="metro-strip"></div>
+<div class="header">
+  <div class="header-left">
+    <div class="h-logo"><img src="/static/dmrc-logo.png" alt="DMRC"></div>
+    <div>
+      <div class="h-title">DMRC <span>Admin</span> Dashboard</div>
+      <div class="h-sub">Hospital & Employee Management</div>
+    </div>
+  </div>
+  <button class="btn-logout" onclick="window.location.href='/logout'">Sign out</button>
+</div>
+
+<div class="main">
+  <div class="tab-bar">
+    <div class="tab active" onclick="setTab('uploads')">File Uploads</div>
+    <div class="tab" onclick="setTab('employees')">Manage Employees</div>
+    <div class="tab" onclick="setTab('records')">Employee Records</div>
+    <div class="tab" onclick="setTab('additional')">Additional Hospitals</div>
+    <div class="tab" onclick="setTab('profile')">My Profile</div>
+  </div>
+
+  <!-- FILE UPLOADS -->
+  <div class="tab-content active" id="tab-uploads">
+
+    <!-- STATUS OVERVIEW -->
+    <div class="section">
+      <div class="section-title">Current Status</div>
+      <div id="statusCards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem">
+        <div class="stat-card" id="sc-excel"><div class="sc-icon">📊</div><div class="sc-label">Hospital Excel</div><div class="sc-val" id="sv-excel">Loading…</div></div>
+        <div class="stat-card" id="sc-pdf"><div class="sc-icon">📄</div><div class="sc-label">Hospital PDF</div><div class="sc-val" id="sv-pdf">Loading…</div></div>
+        <div class="stat-card" id="sc-add"><div class="sc-icon">📋</div><div class="sc-label">Office Orders</div><div class="sc-val" id="sv-add">Loading…</div></div>
+        <div class="stat-card" id="sc-emp"><div class="sc-icon">👥</div><div class="sc-label">Employees</div><div class="sc-val" id="sv-emp">Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- HOSPITAL EXCEL -->
+    <div class="section">
+      <div class="section-title">1. Main Consolidated Hospital Excel</div>
+      <div class="file-section-card">
+        <div class="fsc-left">
+          <div class="fsc-title">Hospital Excel (Consolidated List)</div>
+          <div class="fsc-desc">DMRC annual consolidated hospital list. Column names and validity date are auto-detected from the file. Powers all search, annual checkup, and cashless features.</div>
+          <div class="upload-zone" style="margin-top:.75rem">
+            <input type="file" accept=".xlsx,.xls" onchange="uploadFile(this,'hospital_excel')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div class="uz-title" id="hz-label">Click or drag to upload .xlsx / .xls</div>
+            <div class="uz-sub">Replaces all hospital records in database</div>
+          </div>
+
+          <!-- Manual validity date -->
+          <div style="margin-top:1rem;padding:1rem;background:#f9f5ef;border-radius:10px;border:1px solid #e8ddd0">
+            <div style="font-size:12px;font-weight:700;color:#5a4a3a;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.04em">📅 Set / Update Validity Date</div>
+            <div style="font-size:12px;color:#8a7a6a;margin-bottom:.6rem">If the date was not auto-detected from the file, or you want to change it, enter it manually here.</div>
+            <div style="display:flex;gap:.5rem;align-items:center">
+              <input type="date" id="manualValidityDate" style="flex:1;background:#fff;border:1.5px solid #e0d5c8;border-radius:8px;padding:.5rem .75rem;font-size:13px;font-family:Inter,sans-serif;color:#1a1a1a;outline:none">
+              <button class="btn btn-primary" onclick="setManualValidity()" style="padding:.5rem 1rem;white-space:nowrap">Save Date</button>
+            </div>
+            <div id="currentValidityDisplay" style="margin-top:.5rem;font-size:12px;color:#8a7a6a"></div>
+          </div>
+        </div>
+        <div class="fsc-right" id="fsr-excel">
+          <div class="fsr-empty">No file uploaded yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOSPITAL PDF -->
+    <div class="section">
+      <div class="section-title">2. Consolidated Hospital List PDF</div>
+      <div class="file-section-card">
+        <div class="fsc-left">
+          <div class="fsc-title">Hospital List PDF</div>
+          <div class="fsc-desc">Employees can view and download this PDF. It is automatically shown until the validity date expires — no action needed from admin until expiry. Data extraction is from Excel only.</div>
+          <div class="upload-zone" style="margin-top:.75rem">
+            <input type="file" accept=".pdf" onchange="uploadFile(this,'hospital_pdf')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div class="uz-title" id="pz-label">Click or drag to upload .pdf</div>
+            <div class="uz-sub">For employee view/download only — auto-expires</div>
+          </div>
+        </div>
+        <div class="fsc-right" id="fsr-pdf">
+          <div class="fsr-empty">No file uploaded yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADDITIONAL EXCEL -->
+    <div class="section">
+      <div class="section-title">3. Additional Hospitals (Office Orders)</div>
+      <div class="card">
+        <div class="fsc-title" style="margin-bottom:.3rem">Office Order Excel Files</div>
+        <div class="fsc-desc" style="margin-bottom:1rem">Upload Excel files from office orders. Each file is stored separately and searched alongside the main list. You can upload multiple files — select multiple at once or upload one by one. Office order number and validity date are auto-detected from each file.</div>
+
+        <!-- Drop zone — supports multiple files -->
+        <div class="multi-upload-zone" id="multiUploadZone">
+          <input type="file" id="additionalFileInput" accept=".xlsx,.xls" multiple onchange="uploadMultipleAdditional(this)">
+          <div class="muz-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="muz-title">Click to select or drag & drop Excel files here</div>
+          <div class="muz-sub">You can select multiple files at once (.xlsx / .xls)</div>
+        </div>
+
+        <!-- Upload progress list -->
+        <div id="uploadProgressList" style="margin-top:.75rem;display:none"></div>
+
+        <!-- Uploaded files list -->
+        <div style="margin-top:1rem">
+          <div style="font-size:11px;font-weight:700;color:#8a7a6a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">Uploaded Office Order Files</div>
+          <div id="additionalFilesList">
+            <div style="font-size:13px;color:#b0a090;padding:.75rem;background:#f9f5ef;border-radius:8px;border:1px solid #e8ddd0;text-align:center">No office order files uploaded yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEE EXCEL -->
+    <div class="section">
+      <div class="section-title">4. Employee Records Excel</div>
+      <div class="file-section-card">
+        <div class="fsc-left">
+          <div class="fsc-title">Employee Excel</div>
+          <div class="fsc-desc">Upload to add or update employee login records. Required columns: Employee_ID, Name, Password, Department, Status. Existing employees are updated; new ones are added.</div>
+          <div class="upload-zone" style="margin-top:.75rem">
+            <input type="file" accept=".xlsx,.xls" onchange="uploadFile(this,'employee_excel')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div class="uz-title" id="ez-label">Click or drag to upload .xlsx / .xls</div>
+            <div class="uz-sub">Adds / updates employee records</div>
+          </div>
+        </div>
+        <div class="fsc-right" id="fsr-employees">
+          <div class="fsr-empty">No employees loaded yet</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MANAGE EMPLOYEES -->
+  <div class="tab-content" id="tab-employees">
+    <div class="grid3">
+      <div class="card">
+        <div class="card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Add Employee
+        </div>
+        <div class="card-desc">Add a new employee to the system.</div>
+        <div class="field"><label>Employee ID</label><input id="add-id" placeholder="e.g. EMP010"></div>
+        <div class="field"><label>Full Name</label><input id="add-name" placeholder="Full name"></div>
+        <div class="field"><label>Password</label><input type="password" id="add-pass" placeholder="Initial password"></div>
+        <div class="field"><label>Department</label><input id="add-dept" placeholder="e.g. Operations"></div>
+        <button class="btn btn-primary btn-full" onclick="addEmployee()">Add Employee</button>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Remove Employee
+        </div>
+        <div class="card-desc">Remove an employee from the system.</div>
+        <div class="field"><label>Employee ID</label><input id="rm-id" placeholder="e.g. EMP010"></div>
+        <button class="btn btn-danger btn-full" onclick="removeEmployee()">Remove Employee</button>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Reset Password
+        </div>
+        <div class="card-desc">Set a new password for an employee.</div>
+        <div class="field"><label>Employee ID</label><input id="rp-id" placeholder="e.g. EMP001"></div>
+        <div class="field"><label>New Password</label><input type="password" id="rp-pass" placeholder="New password"></div>
+        <button class="btn btn-primary btn-full" onclick="resetPassword()">Reset Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE RECORDS -->
+  <div class="tab-content" id="tab-records">
+    <div class="section">
+      <div class="section-title">All Employees</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="emp-table">
+          <thead><tr><th>Employee ID</th><th>Name</th><th>Department</th><th>Status</th></tr></thead>
+          <tbody id="empBody"><tr><td colspan="4" style="text-align:center;padding:1.5rem;color:#475569">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADDITIONAL HOSPITALS -->
+  <div class="tab-content" id="tab-additional">
+    <div class="section">
+      <div class="section-title">Additional Hospitals (from Office Orders)</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="emp-table" id="addTable">
+          <thead><tr><th>Hospital</th><th>Address</th><th>Office Order</th><th>Valid Upto</th><th>Source File</th><th></th></tr></thead>
+          <tbody id="addBody"><tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#475569">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY PROFILE -->
+  <div class="tab-content" id="tab-profile">
+    <div class="section">
+      <div class="section-title">My Profile</div>
+      <div class="grid2">
+
+        <div class="card">
+          <div class="card-icon" style="background:rgba(192,30,30,.12)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="card-title">Change Admin ID</div>
+          <div class="card-desc">Update your Admin login ID. You will need to use the new ID next time you log in.</div>
+          <div class="field"><label>Current Password</label><input type="password" id="cid-pass" placeholder="Enter current password"></div>
+          <div class="field"><label>New Admin ID</label><input id="cid-new" placeholder="e.g. ADMIN002"></div>
+          <button class="btn btn-primary btn-full" onclick="changeAdminId()">Update Admin ID</button>
+        </div>
+
+        <div class="card">
+          <div class="card-icon" style="background:rgba(234,179,8,.1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="card-title">Change Password</div>
+          <div class="card-desc">Update your Admin login password. Make sure to use a strong password.</div>
+          <div class="field"><label>Current Password</label><input type="password" id="cp-current" placeholder="Enter current password"></div>
+          <div class="field"><label>New Password</label><input type="password" id="cp-new" placeholder="Enter new password"></div>
+          <div class="field"><label>Confirm New Password</label><input type="password" id="cp-confirm" placeholder="Confirm new password"></div>
+          <button class="btn btn-primary btn-full" onclick="changePassword()">Update Password</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function setTab(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['uploads','employees','records','additional','profile'][i]===id));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id===`tab-${id}`));
+  if(id==='records') loadEmployees();
+  if(id==='additional') loadAdditional();
+  if(id==='uploads'){ loadStatus(); loadCurrentValidity(); }
+}
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),4500);
+}
+
+// ── Load status of all uploaded files ────────────────────────────────
+function loadStatus(){
+  fetch('/api/admin/status').then(r=>r.json()).then(d=>{
+    if(!d.success) return;
+
+    // Stat bar
+    const h=d.hospital_excel, p=d.hospital_pdf, a=d.additional, e=d.employees;
+    document.getElementById('sv-excel').textContent = h.uploaded ? h.count+' hospitals' : 'Not uploaded';
+    document.getElementById('sv-pdf').textContent   = p.uploaded ? (p.expired?'Expired':'Active') : 'Not uploaded';
+    document.getElementById('sv-add').textContent   = a.total>0 ? a.total+' hospitals' : 'None';
+    document.getElementById('sv-emp').textContent   = e.count+' employees';
+
+    // Hospital Excel right panel
+    const excelRight = document.getElementById('fsr-excel');
+    if(h.uploaded){
+      let cls = h.expired?'expired': (h.days_left!==null&&h.days_left<=30?'warning':'active');
+      let statusText = h.expired?'Expired': (h.days_left!==null ? (h.days_left<=30?`Expiring in ${h.days_left} days`:`Valid — ${h.days_left} days left`):'Active');
+      excelRight.innerHTML = `
+        <div class="fsr-status ${cls}">${statusText}</div>
+        <div class="fsr-detail"><strong>${h.count}</strong> hospitals loaded</div>
+        ${h.validity_date?`<div class="fsr-detail">Valid upto <strong>${h.validity_date}</strong></div>`:''}
+        <div class="fsr-btns">
+          <div class="fsr-btn-remove" onclick="removeSection('hospital_excel')">🗑 Remove all records</div>
+        </div>`;
+    } else {
+      excelRight.innerHTML='<div class="fsr-empty">No records in database<br>Upload Excel to begin</div>';
+    }
+
+    // PDF right panel
+    const pdfRight = document.getElementById('fsr-pdf');
+    if(p.uploaded){
+      let cls = p.expired?'expired': (p.days_left!==null&&p.days_left<=30?'warning':'active');
+      let statusText = p.expired?'Expired': (p.days_left!==null ? (p.days_left<=30?`Expiring in ${p.days_left} days`:`Valid — ${p.days_left} days left`):'Active');
+      let canRemove = p.expired || p.days_left===null;
+      pdfRight.innerHTML = `
+        <div class="fsr-status ${cls}">${statusText}</div>
+        ${p.validity_date?`<div class="fsr-detail">Valid upto <strong>${p.validity_date}</strong></div>`:''}
+        <div class="fsr-detail">${p.expired?'PDF has expired — you can now upload a new one':'PDF auto-hides after validity expires'}</div>
+        <div class="fsr-btns">
+          <div class="fsr-btn-remove ${canRemove?'':'blocked'}" onclick="${canRemove?"removeSection('hospital_pdf')":'showToast(\"PDF is still valid — cannot remove until expiry.\",\"error\")'}">
+            🗑 ${canRemove?'Remove PDF':'Remove (locked until expiry)'}
+          </div>
+        </div>`;
+    } else {
+      pdfRight.innerHTML='<div class="fsr-empty">No PDF uploaded yet<br>Upload to give employees view access</div>';
+    }
+
+    document.getElementById('sv-add').textContent = a.total>0 ? `${a.total} hospitals (${a.files.length} files)` : 'None';
+
+    // Additional hospitals — render as individual file cards
+    const addList = document.getElementById('additionalFilesList');
+    if(addList){
+      if(a.files && a.files.length>0){
+        fetch('/api/admin/additional_hospitals').then(r=>r.json()).then(hd=>{
+          const countByFile={};
+          if(hd.data) hd.data.forEach(h=>{countByFile[h.source_file]=(countByFile[h.source_file]||0)+1;});
+          let html='';
+          a.files.forEach(f=>{
+            const count=countByFile[f.source_file]||0;
+            html+=`<div class="uploaded-file-card">
+              <div class="ufc-icon">📋</div>
+              <div class="ufc-body">
+                <div class="ufc-name">${f.source_file}</div>
+                <div class="ufc-meta">
+                  <strong>${count}</strong> hospitals imported<br>
+                  ${f.office_order?`Office Order: <strong>${f.office_order}</strong><br>`:''}
+                  ${f.validity_date?`Valid upto: <strong>${f.validity_date}</strong>`:'No validity date detected'}
+                </div>
+              </div>
+              <button class="ufc-remove" onclick="removeAdditionalFile('${f.source_file}')">🗑 Remove</button>
+            </div>`;
+          });
+          addList.innerHTML=html;
+        });
+      } else {
+        addList.innerHTML='<div style="font-size:13px;color:#b0a090;padding:.75rem;background:#f9f5ef;border-radius:8px;border:1px solid #e8ddd0;text-align:center">No office order files uploaded yet</div>';
+      }
+    }
+
+    // Employee right panel
+    const empRight = document.getElementById('fsr-employees');
+    if(e.count>0){
+      empRight.innerHTML = `
+        <div class="fsr-status active">Active</div>
+        <div class="fsr-detail"><strong>${e.count}</strong> employee accounts</div>
+        <div class="fsr-btns">
+          <div class="fsr-btn-remove" onclick="removeSection('employee_excel')">🗑 Remove all employees</div>
+        </div>`;
+    } else {
+      empRight.innerHTML='<div class="fsr-empty">No employees loaded<br>Upload Excel or add manually</div>';
+    }
+  });
+}
+
+function removeSection(type, sourceFile){
+  const msgs = {
+    hospital_excel: 'Remove all hospital records from the database?',
+    hospital_pdf:   'Remove the hospital list PDF?',
+    employee_excel: 'Remove all employee records? They will not be able to login.',
+    additional:     `Remove all hospitals from ${sourceFile}?`,
+  };
+  if(!confirm(msgs[type]||'Are you sure?')) return;
+  const urlMap = {
+    hospital_excel:'/api/admin/remove_hospital_excel',
+    hospital_pdf:  '/api/admin/remove_pdf',
+    employee_excel:'/api/admin/remove_employee_excel',
+    additional:    '/api/admin/delete_additional',
+  };
+  const bodyMap = {
+    additional: JSON.stringify({source_file: sourceFile}),
+  };
+  fetch(urlMap[type],{method:'POST',headers:{'Content-Type':'application/json'},body:bodyMap[type]||'{}'})
+    .then(r=>r.json()).then(d=>{
+      showToast(d.message, d.success?'success':'error');
+      if(d.success) loadStatus();
+    });
+}
+
+function uploadFile(input,type){
+  const file=input.files[0];
+  if(!file) return;
+  const labelMap={hospital_excel:'hz-label',employee_excel:'ez-label',additional_excel:'az-label',hospital_pdf:'pz-label'};
+  const label=document.getElementById(labelMap[type]);
+  if(label) label.textContent=`Uploading ${file.name}…`;
+  const urlMap={
+    hospital_excel:'/api/admin/upload_hospital_excel',
+    employee_excel:'/api/admin/upload_employee_excel',
+    additional_excel:'/api/admin/upload_additional_excel',
+    hospital_pdf:'/api/admin/upload_pdf'
+  };
+  const fd=new FormData(); fd.append('file',file);
+  fetch(urlMap[type],{method:'POST',body:fd})
+    .then(r=>r.json()).then(d=>{
+      if(label) label.textContent = d.success ? `✓ ${file.name}` : 'Upload failed';
+      showToast(d.message, d.success?'success':'error');
+      if(d.success) loadStatus();
+    }).catch(()=>showToast('Upload failed. Please try again.','error'));
+}
+
+// ── Multi-file upload for office orders ─────────────────────────────
+async function uploadMultipleAdditional(input){
+  const files = Array.from(input.files);
+  if(!files.length) return;
+
+  const progressList = document.getElementById('uploadProgressList');
+  progressList.style.display='block';
+  progressList.innerHTML='';
+
+  // Create progress items for each file
+  files.forEach(f=>{
+    progressList.innerHTML+=`<div class="progress-item" id="pi-${f.name.replace(/[^a-z0-9]/gi,'_')}">
+      <span style="font-size:16px">📄</span>
+      <span class="pi-name">${f.name}</span>
+      <span class="pi-status uploading" id="ps-${f.name.replace(/[^a-z0-9]/gi,'_')}">Uploading…</span>
+    </div>`;
+  });
+
+  // Upload each file sequentially
+  for(const file of files){
+    const safeId = file.name.replace(/[^a-z0-9]/gi,'_');
+    const statusEl = document.getElementById(`ps-${safeId}`);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch('/api/admin/upload_additional_excel',{method:'POST',body:fd});
+      const d = await r.json();
+      if(statusEl){
+        statusEl.textContent = d.success ? '✅ Done' : '❌ Failed';
+        statusEl.className = `pi-status ${d.success?'done':'error'}`;
+      }
+      if(!d.success) showToast(`${file.name}: ${d.message}`,'error');
+    } catch(err){
+      if(statusEl){ statusEl.textContent='❌ Error'; statusEl.className='pi-status error'; }
+    }
+  }
+
+  showToast(`${files.length} file(s) processed.`, 'success');
+  // Reset input
+  input.value='';
+  // Reload status
+  setTimeout(()=>{ loadStatus(); progressList.style.display='none'; }, 1200);
+}
+
+function setManualValidity(){
+  const input = document.getElementById('manualValidityDate');
+  const val = input.value; // format: YYYY-MM-DD from date picker
+  if(!val){ showToast('Please select a date.','error'); return; }
+  // Convert YYYY-MM-DD to DD.MM.YYYY for storage
+  const parts = val.split('-');
+  const formatted = `${parts[2]}.${parts[1]}.${parts[0]}`;
+  fetch('/api/admin/set_validity_date',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({validity_date: formatted})
+  }).then(r=>r.json()).then(d=>{
+    showToast(d.message, d.success?'success':'error');
+    if(d.success){
+      document.getElementById('currentValidityDisplay').textContent = `Current validity date: ${formatted}`;
+      loadStatus();
+    }
+  });
+}
+
+// Pre-fill current validity date in the date picker
+function loadCurrentValidity(){
+  fetch('/api/admin/status').then(r=>r.json()).then(d=>{
+    if(d.success && d.hospital_excel.validity_date){
+      const parts = d.hospital_excel.validity_date.split('.');
+      if(parts.length===3){
+        // Convert DD.MM.YYYY → YYYY-MM-DD for date input
+        document.getElementById('manualValidityDate').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        document.getElementById('currentValidityDisplay').textContent = `Current: ${d.hospital_excel.validity_date}`;
+      }
+    }
+  });
+}
+  if(!confirm(`Remove all hospitals from "${sourceFile}"?`)) return;
+  fetch('/api/admin/delete_additional',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source_file:sourceFile})})
+    .then(r=>r.json()).then(d=>{
+      showToast(d.message, d.success?'success':'error');
+      if(d.success) loadStatus();
+    });
+}
+
+// Drag and drop support for multi-upload zone
+window.addEventListener('DOMContentLoaded',()=>{
+  loadStatus();
+  loadCurrentValidity();
+  const zone = document.getElementById('multiUploadZone');
+  if(zone){
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragover');});
+    zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
+    zone.addEventListener('drop',e=>{
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if(files.length){
+        const input = document.getElementById('additionalFileInput');
+        // Create a DataTransfer to assign files to input
+        const dt = new DataTransfer();
+        Array.from(files).filter(f=>f.name.match(/\.(xlsx|xls)$/i)).forEach(f=>dt.items.add(f));
+        if(dt.files.length){
+          input.files = dt.files;
+          uploadMultipleAdditional(input);
+        } else {
+          showToast('Please drop Excel files only (.xlsx or .xls)','error');
+        }
+      }
+    });
+  }
+});
+
+function addEmployee(){
+  const id=document.getElementById('add-id').value.trim(),name=document.getElementById('add-name').value.trim(),pass=document.getElementById('add-pass').value.trim(),dept=document.getElementById('add-dept').value.trim();
+  if(!id||!name||!pass){showToast('ID, name and password are required.','error');return;}
+  fetch('/api/admin/add_employee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:id,name,password:pass,department:dept})})
+    .then(r=>r.json()).then(d=>{showToast(d.message,d.success?'success':'error');if(d.success){['add-id','add-name','add-pass','add-dept'].forEach(x=>document.getElementById(x).value='');}});
+}
+
+function removeEmployee(){
+  const id=document.getElementById('rm-id').value.trim();
+  if(!id){showToast('Employee ID is required.','error');return;}
+  if(!confirm(`Remove employee ${id}?`)) return;
+  fetch('/api/admin/remove_employee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:id})})
+    .then(r=>r.json()).then(d=>{showToast(d.message,d.success?'success':'error');if(d.success)document.getElementById('rm-id').value='';});
+}
+
+function resetPassword(){
+  const id=document.getElementById('rp-id').value.trim(),pass=document.getElementById('rp-pass').value.trim();
+  if(!id||!pass){showToast('ID and new password are required.','error');return;}
+  fetch('/api/admin/reset_password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:id,new_password:pass})})
+    .then(r=>r.json()).then(d=>{showToast(d.message,d.success?'success':'error');if(d.success){document.getElementById('rp-id').value='';document.getElementById('rp-pass').value='';}});
+}
+
+function loadEmployees(){
+  fetch('/api/admin/employees').then(r=>r.json()).then(d=>{
+    const tbody=document.getElementById('empBody');
+    if(!d.data||!d.data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:#475569">No employees found.</td></tr>';return;}
+    tbody.innerHTML=d.data.map(e=>`<tr>
+      <td style="color:#93c5fd;font-weight:500">${e.employee_id}</td>
+      <td>${e.name}</td>
+      <td style="color:#94a3b8">${e.department||'—'}</td>
+      <td><span class="${e.status==='Active'?'status-active':'status-inactive'}">${e.status}</span></td>
+    </tr>`).join('');
+  });
+}
+
+function loadAdditional(){
+  fetch('/api/admin/additional_hospitals').then(r=>r.json()).then(d=>{
+    const tbody=document.getElementById('addBody');
+    if(!d.data||!d.data.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#475569">No additional hospitals uploaded yet.</td></tr>';return;}
+    // Group by source file for display
+    const seen=new Set();
+    tbody.innerHTML=d.data.map(h=>{
+      const showDelete=!seen.has(h.source_file);
+      seen.add(h.source_file);
+      return `<tr>
+        <td style="font-weight:500;color:#e2e8f0">${h.hospital_name}</td>
+        <td style="color:#94a3b8;font-size:12px">${(h.address||'').slice(0,40)}${h.address&&h.address.length>40?'…':''}</td>
+        <td style="color:#fcd34d;font-size:12px">${h.office_order||'—'}</td>
+        <td style="color:#fca5a5;font-size:12px">${h.validity_date||'—'}</td>
+        <td style="color:#6b7280;font-size:11px">${h.source_file}</td>
+        <td>${showDelete?`<button class="btn btn-danger" style="font-size:11px;padding:3px 8px" onclick="deleteAdditional('${h.source_file}')">Remove</button>`:''}</td>
+      </tr>`;
+    }).join('');
+  });
+}
+
+function deleteAdditional(sourceFile){
+  if(!confirm(`Remove all hospitals from ${sourceFile}?`)) return;
+  fetch('/api/admin/delete_additional',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source_file:sourceFile})})
+    .then(r=>r.json()).then(d=>{showToast(d.message,d.success?'success':'error');if(d.success)loadAdditional();});
+}
+
+function changeAdminId(){
+  const pass=document.getElementById('cid-pass').value.trim();
+  const newId=document.getElementById('cid-new').value.trim().toUpperCase();
+  if(!pass||!newId){showToast('Current password and new Admin ID are required.','error');return;}
+  fetch('/api/admin/change_id',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current_password:pass,new_id:newId})})
+    .then(r=>r.json()).then(d=>{
+      showToast(d.message,d.success?'success':'error');
+      if(d.success){
+        document.getElementById('cid-pass').value='';
+        document.getElementById('cid-new').value='';
+        setTimeout(()=>window.location.href='/logout',1500);
+      }
+    });
+}
+
+function changePassword(){
+  const current=document.getElementById('cp-current').value.trim();
+  const newPass=document.getElementById('cp-new').value.trim();
+  const confirm=document.getElementById('cp-confirm').value.trim();
+  if(!current||!newPass||!confirm){showToast('All fields are required.','error');return;}
+  if(newPass!==confirm){showToast('New passwords do not match.','error');return;}
+  if(newPass.length<6){showToast('Password must be at least 6 characters.','error');return;}
+  fetch('/api/admin/change_password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current_password:current,new_password:newPass})})
+    .then(r=>r.json()).then(d=>{
+      showToast(d.message,d.success?'success':'error');
+      if(d.success){
+        document.getElementById('cp-current').value='';
+        document.getElementById('cp-new').value='';
+        document.getElementById('cp-confirm').value='';
+        setTimeout(()=>window.location.href='/logout',1500);
+      }
+    });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DMRC Hospital Portal — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Inter',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:#f5f0e8}
+.bg{position:fixed;inset:0;z-index:0;background:linear-gradient(135deg,#f5f0e8 0%,#ede5d8 50%,#f5f0e8 100%)}
+.bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(139,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,0,0,.04) 1px,transparent 1px);background-size:44px 44px}
+.metro-strip{position:fixed;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#E31E24 0%,#F7941D 20%,#8DC63F 40%,#006838 60%,#0072BC 80%,#662D91 100%);z-index:100}
+.card{position:relative;z-index:1;background:#fff;border:1px solid #e0d5c8;border-radius:20px;padding:2.5rem;width:100%;max-width:420px;box-shadow:0 4px 32px rgba(139,0,0,.1)}
+.logo{text-align:center;margin-bottom:2rem}
+.logo-img-wrap{display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#8B0000,#C01E1E);margin-bottom:1rem;box-shadow:0 4px 16px rgba(192,30,30,.35)}
+.logo-img-wrap img{width:54px;height:54px;object-fit:contain;filter:brightness(0) invert(1)}
+.logo-title{font-size:22px;font-weight:700;color:#1a1a1a}
+.logo-title span{color:#C01E1E}
+.logo-sub{font-size:12px;color:#8a7a6a;margin-top:.3rem}
+.tab-group{display:flex;background:#f5f0e8;border-radius:10px;padding:3px;margin-bottom:1.5rem;border:1px solid #e0d5c8}
+.tab{flex:1;padding:.55rem;text-align:center;font-size:13px;font-weight:600;color:#8a7a6a;border-radius:8px;cursor:pointer;transition:all .2s}
+.tab.active{background:#C01E1E;color:#fff;box-shadow:0 2px 8px rgba(192,30,30,.3)}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:11px;font-weight:700;color:#8a7a6a;margin-bottom:.4rem;letter-spacing:.06em;text-transform:uppercase}
+.field input{width:100%;background:#f9f5ef;border:1.5px solid #e0d5c8;border-radius:10px;padding:.75rem 1rem;color:#1a1a1a;font-size:14px;font-family:'Inter',sans-serif;outline:none}
+.field input:focus{border-color:#C01E1E;background:#fff}
+.field input::placeholder{color:#b0a090}
+.btn-login{width:100%;background:linear-gradient(135deg,#8B0000,#C01E1E);border:none;border-radius:10px;padding:.85rem;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:.5rem;box-shadow:0 4px 16px rgba(192,30,30,.35);letter-spacing:.02em}
+.btn-login:hover{opacity:.92}
+.error-msg{background:#ffebee;border:1px solid #ef9a9a;border-radius:10px;padding:.7rem 1rem;color:#b71c1c;font-size:13px;margin-bottom:1rem;display:none;font-weight:500}
+.demo-info{margin-top:1.5rem;padding:.9rem 1rem;background:#f9f5ef;border-radius:10px;border:1px solid #e0d5c8}
+.demo-info p{font-size:11px;color:#8a7a6a;margin-bottom:.25rem}
+.demo-info span{color:#5a4a3a;font-weight:600}
+.spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="metro-strip"></div>
+<div class="bg"></div><div class="bg-grid"></div>
+<div class="card">
+  <div class="logo">
+    <div class="logo-img-wrap"><img src="/static/dmrc-logo.png" alt="DMRC"></div>
+    <div class="logo-title">DMRC <span>Hospital</span> Portal</div>
+    <div class="logo-sub">Delhi Metro Rail Corporation</div>
+  </div>
+  <div class="tab-group">
+    <div class="tab active" onclick="setRole('employee')">Employee Login</div>
+    <div class="tab" onclick="setRole('admin')">Admin Login</div>
+  </div>
+  <div id="errorMsg" class="error-msg"></div>
+  <div class="field"><label id="idLabel">Employee ID</label><input type="text" id="userId" placeholder="e.g. EMP001" autocomplete="off"></div>
+  <div class="field"><label>Password</label><input type="password" id="userPass" placeholder="Enter your password"></div>
+  <button class="btn-login" onclick="doLogin()" id="loginBtn">
+    <span id="btnText">Sign In</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+  <div class="demo-info">
+    <p>Demo — <span>Employee:</span> EMP001 / emp123</p>
+    <p>Demo — <span>Admin:</span> ADMIN001 / admin123</p>
+  </div>
+</div>
+<script>
+let currentRole='employee';
+function setRole(r){currentRole=r;document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&r==='employee')||(i===1&&r==='admin')));document.getElementById('idLabel').textContent=r==='admin'?'Admin ID':'Employee ID';document.getElementById('userId').placeholder=r==='admin'?'e.g. ADMIN001':'e.g. EMP001';document.getElementById('errorMsg').style.display='none';}
+function doLogin(){const id=document.getElementById('userId').value.trim(),pass=document.getElementById('userPass').value.trim(),err=document.getElementById('errorMsg');err.style.display='none';if(!id||!pass){err.textContent='Please enter your ID and password.';err.style.display='block';return;}document.getElementById('btnText').style.display='none';document.getElementById('spinner').style.display='block';document.getElementById('loginBtn').disabled=true;fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,password:pass,role:currentRole})}).then(r=>r.json()).then(d=>{if(d.success)window.location.href=d.redirect;else{err.textContent=d.message;err.style.display='block';}}).finally(()=>{document.getElementById('btnText').style.display='block';document.getElementById('spinner').style.display='none';document.getElementById('loginBtn').disabled=false;});}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
+</body>
+</html>
